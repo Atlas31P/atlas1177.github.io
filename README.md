@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -8,7 +8,8 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: black;
+      background: url('https://source.unsplash.com/1600x900/?maldives,beach') no-repeat center center fixed;
+      background-size: cover;
       color: #00ccff;
       font-family: 'Courier New', Courier, monospace;
       overflow: hidden;
@@ -41,7 +42,6 @@
       left: 0;
       z-index: 1;
       overflow: hidden;
-      background: radial-gradient(ellipse at center, #000000 0%, #001f33 100%);
     }
 
     canvas {
@@ -71,11 +71,17 @@
   </style>
 </head>
 <body>
-  <div id="loading">Loading...</div>
+  <div id="loading">Caricamento...</div>
   <h1 id="mainTitle">Pietra Miliare Maldives</h1>
   <div class="matrix">
     <canvas id="matrixCanvas"></canvas>
   </div>
+
+  <!-- Musica di sottofondo -->
+  <audio autoplay loop>
+    <source src="path_to_your_boduberu_audio.mp3" type="audio/mpeg">
+    Il tuo browser non supporta l'elemento audio.
+  </audio>
 
   <script>
     const canvas = document.getElementById("matrixCanvas");
@@ -84,39 +90,39 @@
     let width = canvas.width = window.innerWidth;
     let height = canvas.height = window.innerHeight;
 
-    const message = "until you make it... zitto e nuota zitto e nuota nuota nuota... ";
-    const lines = 8; // number of wave lines
+    const baseMessage = " until you make it... zitto e nuota zitto e nuota nuota nuota... ";
     const fontSize = 22;
     const textSpacing = fontSize;
-    const waveAmplitudeBase = 20;
-    const waveFrequencyBase = 0.015;
-    const waveSpeedBase = 0.5;
+    const lines = 8;
 
     let offset = 0;
 
+    // Ripeti il messaggio per coprire lo schermo più margine
+    const repeatFactor = Math.ceil(width / (baseMessage.length * textSpacing)) + 2;
+    const fullMessage = baseMessage.repeat(repeatFactor);
+    const letters = fullMessage.split('');
+
     function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-      ctx.fillRect(0, 0, width, height);
+      ctx.clearRect(0, 0, width, height);
 
       ctx.font = fontSize + "px Courier New";
       ctx.shadowColor = "#00ffff";
       ctx.shadowBlur = 8;
 
       for (let l = 0; l < lines; l++) {
-        const waveAmplitude = waveAmplitudeBase + l * 5;
-        const waveFrequency = waveFrequencyBase + l * 0.002;
-        const waveSpeed = waveSpeedBase + l * 0.1;
+        const waveAmplitude = 20 + l * 5;
+        const waveFrequency = 0.015 + l * 0.002;
+        const waveSpeed = 0.5 + l * 0.1;
         const yOffset = (height / (lines + 1)) * (l + 1);
 
-        for (let i = 0; i < message.length; i++) {
-          const x = (i * textSpacing - offset * waveSpeed) % (width + message.length * textSpacing);
+        for (let i = 0; i < letters.length; i++) {
+          const x = ((i * textSpacing) - (offset * waveSpeed)) % (letters.length * textSpacing);
           const y = yOffset + Math.sin((x + offset) * waveFrequency) * waveAmplitude;
 
-          // Color shift for retro-futuristic effect
           const hue = 200 + (l * 10) % 60;
           ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
 
-          ctx.fillText(message[i], x, y);
+          ctx.fillText(letters[i], x < 0 ? x + width + textSpacing : x, y);
         }
       }
 
@@ -140,3 +146,4 @@
   </script>
 </body>
 </html>
+
