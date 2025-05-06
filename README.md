@@ -9,7 +9,7 @@
 
     body {
       background: black;
-      color: #00ffcc;
+      color: #00ccff;
       font-family: 'Courier New', Courier, monospace;
       overflow: hidden;
       height: 100vh;
@@ -22,7 +22,7 @@
     h1 {
       font-size: 2em;
       z-index: 10;
-      text-shadow: 0 0 5px #00ffee, 0 0 10px #00ffee, 0 0 20px #00ffee;
+      text-shadow: 0 0 5px #00ccff, 0 0 10px #00ccff, 0 0 20px #00ccff;
       animation: pulse 2s infinite alternate;
       opacity: 0;
       transition: opacity 1.5s ease;
@@ -41,7 +41,7 @@
       left: 0;
       z-index: 1;
       overflow: hidden;
-      background: radial-gradient(ellipse at center, #000000 0%, #001f1f 100%);
+      background: radial-gradient(ellipse at center, #000000 0%, #001f33 100%);
     }
 
     canvas {
@@ -53,7 +53,7 @@
       z-index: 20;
       font-size: 1.5em;
       animation: blink 1s infinite;
-      text-shadow: 0 0 5px #00ffee, 0 0 10px #00ffee;
+      text-shadow: 0 0 5px #00ccff, 0 0 10px #00ccff;
     }
 
     @keyframes blink {
@@ -81,47 +81,61 @@
     const canvas = document.getElementById("matrixCanvas");
     const ctx = canvas.getContext("2d");
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
 
-    const letters = "アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
+    const message = "until you make it... zitto e nuota zitto e nuota nuota nuota... ";
+    const lines = 8; // number of wave lines
+    const fontSize = 22;
+    const textSpacing = fontSize;
+    const waveAmplitudeBase = 20;
+    const waveFrequencyBase = 0.015;
+    const waveSpeedBase = 0.5;
 
-    function drawMatrix() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    let offset = 0;
 
-      ctx.fillStyle = "#00ffcc";
-      ctx.font = fontSize + "px monospace";
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+      ctx.fillRect(0, 0, width, height);
 
-      for (let i = 0; i < drops.length; i++) {
-        const text = letters.charAt(Math.floor(Math.random() * letters.length));
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      ctx.font = fontSize + "px Courier New";
+      ctx.shadowColor = "#00ffff";
+      ctx.shadowBlur = 8;
 
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
+      for (let l = 0; l < lines; l++) {
+        const waveAmplitude = waveAmplitudeBase + l * 5;
+        const waveFrequency = waveFrequencyBase + l * 0.002;
+        const waveSpeed = waveSpeedBase + l * 0.1;
+        const yOffset = (height / (lines + 1)) * (l + 1);
+
+        for (let i = 0; i < message.length; i++) {
+          const x = (i * textSpacing - offset * waveSpeed) % (width + message.length * textSpacing);
+          const y = yOffset + Math.sin((x + offset) * waveFrequency) * waveAmplitude;
+
+          // Color shift for retro-futuristic effect
+          const hue = 200 + (l * 10) % 60;
+          ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
+
+          ctx.fillText(message[i], x, y);
         }
-
-        drops[i]++;
       }
+
+      offset += 1.5;
+      requestAnimationFrame(draw);
     }
 
-    setInterval(drawMatrix, 33);
+    draw();
 
-    // Handle loading effect
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
     window.addEventListener('load', () => {
       setTimeout(() => {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('mainTitle').classList.add('fade-in');
-      }, 3000); // Adjust delay as needed (3000ms = 3s)
-    });
-
-    // Handle resize
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      }, 3000);
     });
   </script>
 </body>
