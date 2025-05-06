@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pietra Miliare Maldives</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background: black;
@@ -27,17 +24,13 @@
       z-index: 10;
       text-shadow: 0 0 5px #00ffee, 0 0 10px #00ffee, 0 0 20px #00ffee;
       animation: pulse 2s infinite alternate;
+      opacity: 0;
+      transition: opacity 1.5s ease;
     }
 
     @keyframes pulse {
-      from {
-        transform: scale(1);
-        opacity: 0.9;
-      }
-      to {
-        transform: scale(1.05);
-        opacity: 1;
-      }
+      from { transform: scale(1); opacity: 0.9; }
+      to { transform: scale(1.05); opacity: 1; }
     }
 
     .matrix {
@@ -54,28 +47,49 @@
     canvas {
       display: block;
     }
+
+    #loading {
+      position: absolute;
+      z-index: 20;
+      font-size: 1.5em;
+      animation: blink 1s infinite;
+      text-shadow: 0 0 5px #00ffee, 0 0 10px #00ffee;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .fade-in {
+      opacity: 1 !important;
+    }
   </style>
 </head>
 <body>
+  <div id="loading">Loading...</div>
+  <h1 id="mainTitle">Pietra Miliare Maldives</h1>
   <div class="matrix">
     <canvas id="matrixCanvas"></canvas>
   </div>
-  <h1>PIETRA MILIARE MALDIVE<br>until you make it...</h1>
 
   <script>
     const canvas = document.getElementById("matrixCanvas");
     const ctx = canvas.getContext("2d");
 
-    canvas.height = window.innerHeight;
     canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    const letters = "アァイゥエオカキクケコサシスセソ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const letters = "アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const fontSize = 14;
     const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
 
-    const drops = Array.from({ length: columns }).fill(1);
-
-    function draw() {
+    function drawMatrix() {
       ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -89,12 +103,23 @@
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
+
         drops[i]++;
       }
     }
 
-    setInterval(draw, 33);
-    window.addEventListener("resize", () => {
+    setInterval(drawMatrix, 33);
+
+    // Handle loading effect
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('mainTitle').classList.add('fade-in');
+      }, 3000); // Adjust delay as needed (3000ms = 3s)
+    });
+
+    // Handle resize
+    window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     });
