@@ -1,102 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pietra Miliare Maldives</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: black;
-      color: #00ffcc;
-      font-family: 'Courier New', Courier, monospace;
+      background-color: black;
       overflow: hidden;
       height: 100vh;
+      font-family: 'Courier New', Courier, monospace;
+      color: #00ffff;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       position: relative;
     }
 
     h1 {
-      font-size: 2em;
+      font-size: 46px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff, 0 0 20px #00ccff;
       z-index: 10;
-      text-shadow: 0 0 5px #00ffee, 0 0 10px #00ffee, 0 0 20px #00ffee;
-      animation: pulse 2s infinite alternate;
-    }
-
-    @keyframes pulse {
-      from {
-        transform: scale(1);
-        opacity: 0.9;
-      }
-      to {
-        transform: scale(1.05);
-        opacity: 1;
-      }
-    }
-
-    .matrix {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      z-index: 1;
-      overflow: hidden;
-      background: radial-gradient(ellipse at center, #000000 0%, #001f1f 100%);
+      margin-bottom: 20px;
     }
 
     canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
       display: block;
     }
   </style>
 </head>
 <body>
-  <div class="matrix">
-    <canvas id="matrixCanvas"></canvas>
-  </div>
-  <h1>PIETRA MILIARE MALDIVE<br>until you make it...</h1>
+  <h1>PIETRA MILIARE MALDIVE</h1>
+  <canvas id="matrixCanvas"></canvas>
 
   <script>
     const canvas = document.getElementById("matrixCanvas");
     const ctx = canvas.getContext("2d");
 
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
 
-    const letters = "アァイゥエオカキクケコサシスセソ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
+    const messages = [
+      "zitto e nuota...",
+      "just keep swimming...",
+      "continuer à nager...",
+      "einfach weiter schwimmen...",
+      "просто плыви...",
+      "继续游泳...",
+      "계속 수영해...",
+      "続けて泳げ...",
+      "prosto plávaj...",
+      "proszę płyń dalej...",
+      "فقط استمر في السباحة..."
+    ];
 
-    const drops = Array.from({ length: columns }).fill(1);
+    const fontSize = 20;
+    const textSpacing = fontSize + 5;
+    const lines = messages.length;
+
+    let offset = 0;
 
     function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, width, height);
+      ctx.font = `${fontSize}px Courier New`;
+      ctx.shadowColor = "#00ffff";
+      ctx.shadowBlur = 10;
 
-      ctx.fillStyle = "#00ffcc";
-      ctx.font = fontSize + "px monospace";
+      for (let l = 0; l < lines; l++) {
+        const yOffset = (height / lines) * (l + 1);
+        const waveAmplitude = 20 + l * 3;
+        const waveFrequency = 0.01 + l * 0.002;
+        const waveSpeed = 1 + l * 0.2;
 
-      for (let i = 0; i < drops.length; i++) {
-        const text = letters.charAt(Math.floor(Math.random() * letters.length));
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        const fullMessage = messages[l].repeat(50); // long repeating line
+        const letters = fullMessage.split('');
 
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
+        for (let i = 0; i < letters.length; i++) {
+          const x = ((i * textSpacing) - (offset * waveSpeed)) % (width + letters.length * textSpacing);
+          const y = yOffset + Math.sin((x + offset) * waveFrequency) * waveAmplitude;
+
+          const hue = 180 + (l * 10) % 60;
+          ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
+
+          ctx.fillText(letters[i], x < 0 ? x + width : x, y);
         }
-        drops[i]++;
       }
+
+      offset += 1.5;
+      requestAnimationFrame(draw);
     }
 
-    setInterval(draw, 33);
-    window.addEventListener("resize", () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    draw();
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
     });
   </script>
 </body>
